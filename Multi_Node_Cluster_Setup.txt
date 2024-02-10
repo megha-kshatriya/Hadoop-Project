@@ -4,8 +4,49 @@
 Hadoop Installation Pre-Requisites
 Below are the pre-requisites for installing Hadoop:
 
-Linux
-JDK 1.8 installed
+1. Node Preparation
+2. Linux VM Instance
+3. JDK 1.8 installed
+
+
+
+
+Node Preparation
+
+I am going to do installation on 6 nodes, below are the different catagories of nodes, I am going to use.
+
+Type	          Count
+Management Node	   1
+Master Node	   2
+Slave Nodes	   2
+
+
+
+
+Management Node : 
+Consists of Mangement services like host/event/
+Cloudera Manager will be installed on it
+Admins will have access to this node for management
+
+Master Nodes :
+Master services will be installed on this node
+Hdfs/Yarn
+It will be memory and code rich node
+
+
+Slave Nodes :
+Slave services like DataNode, NodeManagers zookeepers etc
+they should be high on storage side
+Average memory/CPU cores
+
+
+
+
+cm.asia-south2-a.c.adroit-resolver-413814.internal
+nn.asia-south2-a.c.adroit-resolver-413814.internal
+snn.asia-south1-c.c.adroit-resolver-413814.internal
+dn1.us-central1-a.c.adroit-resolver-413814.internal
+dn2.us-central1-a.c.adroit-resolver-413814.internal
 
 ----------------------------------------------
 Make the connectivity on all nodes
@@ -21,12 +62,6 @@ cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
 
 #Edit Authrozed file : copy all the other server pub key in rest servers so it can help for doing ssh 
 
-cm.asia-south2-a.c.adroit-resolver-413814.internal
-ranger.us-central1-a.c.adroit-resolver-413814.internal
-nn.asia-south2-a.c.adroit-resolver-413814.internal
-snn.us-central1-a.c.adroit-resolver-413814.internal
-dn.us-central1-a.c.adroit-resolver-413814.internal
-dn2.us-central1-a.c.adroit-resolver-413814.internal
 
 
 # Edit sshd_config file & set below parameter
