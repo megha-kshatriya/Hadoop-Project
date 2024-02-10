@@ -1,0 +1,251 @@
+
+
+
+Hadoop Installation Pre-Requisites
+Below are the pre-requisites for installing Hadoop:
+
+Linux
+JDK 1.8 installed
+
+
+----------------------------------------------
+Make the connectivity on all nodes
+
+#Switch to root user > reset password
+sudo passwd root
+
+#Generate key for root user on all nodes
+ssh-keygen -b 2048 -t rsa
+
+#Create Authrized file 
+cat $HOME/.ssh/id_rsa.pub >> $HOME/.ssh/authorized_keys
+
+#Edit Authrozed file : copy all the other server pub key in rest servers so it can help for doing ssh 
+
+cm.asia-south2-a.c.adroit-resolver-413814.internal
+ranger.us-central1-a.c.adroit-resolver-413814.internal
+nn.asia-south2-a.c.adroit-resolver-413814.internal
+snn.us-central1-a.c.adroit-resolver-413814.internal
+dn.us-central1-a.c.adroit-resolver-413814.internal
+dn2.us-central1-a.c.adroit-resolver-413814.internal
+
+
+# Edit sshd_config file & set below parameter
+vi /etc/ssh/sshd_config
+
+	PermitRootLogin yes
+	PasswordAuthentication yes
+	#PermitEmptyPasswords no
+	#PasswordAuthentication no
+
+
+# Restart the sshd service
+sudo systemctl restart sshd.service
+
+
+---------------------------------------------
+Install JDK 
+
+JDK 8 is needed on the Linux Machine. Below are the steps for installing oracle java:
+
+Install java 8 as the root user
+
+
+#Check if Java Installed
+java -version
+
+#Install OpenJDK 8 JDK if no result found , once done check again Java version
+
+To install OpenJDK 8 JDK using yum, run this command:
+sudo yum install java-1.8.0-openjdk-devel -y
+ 
+#Set JAVA_HOME variable : Please specify the path of JAVA_HOME as per your version.
+
+export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk
+echo $JAVA_HOME
+
+---------------------------------------------------
+
+Disable IPV6
+Edit file /etc/sysctl.conf - vi /etc/sysctl.conf
+Add the following lines:
+
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+Execute the following command to reflect the changes.
+
+
+------------------------------------------------
+sysctl -p
+
+
+Selinux
+Just ensure that selinux should be disabled so that it cant impact Hadoop performance.
+
+sudo setenforce 0
+To disable it permanently
+
+edit /etc/selinux/config
+
+SELINUX=disabled
+SELINUXTYPE=targeted
+SETLOCALDEFS=0
+---------------------------------------------------
+
+Transparent Huge Page Compaction
+
+# Check Transparent Huge Page Compaction is enabled
+
+cat /sys/kernel/mm/transparent_hugepage/defrag
+
+#If it is enable then follow below step : 
+
+sudo sed -i '/exit 0/d' /etc/rc.local
+
+sudo su -c 'cat >>/etc/rc.local <<EOL
+if test -f /sys/kernel/mm/transparent_hugepage/enabled; then
+  echo never > /sys/kernel/mm/transparent_hugepage/enabled
+fi
+if test -f /sys/kernel/mm/transparent_hugepage/defrag; then
+   echo never > /sys/kernel/mm/transparent_hugepage/defrag 
+fi
+exit 0
+EOL'
+
+sudo -i source /etc/rc.local
+
+cat /sys/kernel/mm/transparent_hugepage/defrag
+---------------------------------------------------------------
+# Set Swappiness
+sudo sysctl -a | grep vm.swappiness
+sudo su -c 'cat >>/etc/sysctl.conf <<EOL
+'vm.swappiness=0'
+EOL'
+sudo sysctl -p
+
+------------------------------------------------------------
+# Configure NTP 
+timedatectl status
+
+timedatectl list-timezones | grep Asia/Kolkata
+
+sudo timedatectl set-timezone Asia/Kolkata >> If Asia time is not set
+
+timedatectl status
+
+
+-------------------------------------------------------
+
+#Install locate to find any file/directory
+
+sudo yum install mlocate
+
+---------------------------------------------------------------
+
+CM Installation 
+
+#Install wget 
+yum install wget
+
+#Install CM : Validate URL if file is present 
+wget  https://archive.cloudera.com/cm7/7.1.4/cloudera-manager-installer.bin	
+
+
+chmod u+x cloudera-manager-installer.bin
+
+sudo ./cloudera-manager-installer.bin 
+
+---------------------------------------------------------------
+
+Create GCP Instance
+•	Go to the VM instances
+•	Select your project and click Continue.
+•	Click the Create instance button
+•	Specify a Name for your first instance “cm”.
+•	Change the Zone for this instance “asia-south-1-a“ (best is to choose closest to your location).
+•	Select a Machine type for your instance.
+•	In the Boot disk section, click Change to configure your boot disk.
+•	In the OS images tab, choose an “CentOS 7” image.
+•	Select Boot disk type “Standard persistent disk” and size should be “200GB”
+•	Click the “Select” Button.
+•	In Access scopes Select “Allow default access”
+•	In Firewall, choose below options
+    Allow HTTP traffic and Allow HTTPS traffic.
+•	Click the Create button to create and start the instance.
+
+( Note : In firewall make sure to allow port 7180 )
+
+Start Cloudera Manager Server:
+
+sudo systemctl status cloudera-scm-server ( on VM machinge )
+Note: If it’s not running then execute the below command to run the cloudera-scm-server
+sudo systemctl start cloudera-scm-server
+
+•	In a web browser, go to http://<server_host>:7180, where <server_host> is the FQDN or IP address of the host where the Cloudera Manager Server is running.
+Note: If “Unable to Connect” message appears, it means that the Cloudera Manager server has not yet fully started. 
+Log into Cloudera Manager Admin Console. 
+The default credentials are:
+Username: admin Password: admin
+
+
+On the Select Edition page, you can select the edition of Cloudera Manager to install and, optionally, install a license:
+1.Choose which edition to install:
+  Cloudera Data Platform - Data Center Edition Trial, which does not require a license file, but expires after 60 days.
+2.Cloudera Data Platform Data Center Edition
+  If you choose the CDP Data Center Edition Trial, you can upgrade the license at a later time.
+3.Accept the License
+4.Click Continue to proceed with the installation
+
+The Cluster Basics page allows you to specify the Cluster Name.
+Enter a cluster name and then click Continue.
+
+Choose which hosts will run Runtime and other managed services.
+1.The “Specify hosts” page appears. Type the hostnames of a machine: and Click Search.
+2.Click Continue
+
+
+Select Repository
+The Select Repository page allows you to specify repositories for Cloudera Manager Agent and CDH and other software.
+In the Cloudera Manager Agent section:
+1.Select either Public Cloudera Repository or Custom Repository for the Cloudera Manager Agent software.
+2.If you select Custom Repository, do not include the operating system-specific paths in the URL. For instructions on setting up a custom repository, see Configuring a Local Package Repository.
+
+
+Accept JDK License
+Select Install a system-provided version of OpenJDK
+Click Continue.
+
+
+Enter Login Credentials
+Select Another user and enter the username for an account that has password-less sudo privileges.
+Another user: root
+Password: 
+Click Continue.
+
+
+Install Agents
+The Install Agents page displays the progress of the installation. You can click on the Details link for any host to view the installation log. If the installation is stalled, you can click the Abort Installation button to cancel the installation and then view the installation logs to troubleshoot the problem.
+If the installation fails on any hosts, you can click the Retry Failed Hosts to retry all failed hosts, or you can click the Retry link on a specific host.
+After installing the Cloudera Manager Agent on all hosts, click Continue.
+
+After the installation is complete, click Continue.
+Inspect Cluster
+The Inspect Cluster page provides a tool for inspecting network performance as well as the Host Inspector to search for common configuration problems. Cloudera recommends that you run the inspectors sequentially:
+1. Run the Inspect Network Performance tool.
+2. After the network inspector completes, click Show Inspector Results to view the results in a new tab.
+3. Address any reported issues, and click Run Again (if applicable).
+4. Click Inspect Hosts to run the Host Inspector utility.
+5. After the host inspector completes, click Show Inspector Results to view the results in a new tab.
+6.Address any reported issues, and click Run Again (if applicable).
+If the reported issues cannot be resolved in a timely manner, then select the radio button labeled I understand the risks, let me continue with cluster creation, and then click Continue.
+This completes the Cluster Installation wizard and launches the Add Cluster - Configuration wizard.
+
+
+
+
+
+
+
+	
+
+
