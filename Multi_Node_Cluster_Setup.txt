@@ -8,6 +8,8 @@ Linux
 JDK 1.8 installed
 
 
+---
+
 ----------------------------------------------
 Make the connectivity on all nodes
 
