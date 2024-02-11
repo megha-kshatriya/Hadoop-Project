@@ -1,0 +1,48 @@
+Systems Setup
+Systems
+For setting up Cloudera Data Platform, 4 RHEL 7.9 based VM’s are provisioned (please use the latest RHEL version, as needed)
+
+cm.asia-south2-a.c.adroit-resolver-413814.internal
+nn.asia-south2-a.c.adroit-resolver-413814.internal
+snn.asia-south1-c.c.adroit-resolver-413814.internal
+dn1.us-central1-a.c.adroit-resolver-413814.internal
+dn2.us-central1-a.c.adroit-resolver-413814.internal
+
+# cat /etc/redhat-release
+Red Hat Enterprise Linux Server release 7.9 (Maipo)
+Locale information
+
+-------------------------------------------------------
+Locale information
+Add locale related attributes to /etc/environment file in all nodes.
+
+# vi /etc/environment
+LANG=en_US.utf-8
+LC_ALL=en_US.utf-8
+------------------------------------------------------------
+Update all nodes with latest packages
+
+# yum update -y
+
+---------------------------------------------------------
+
+Hosts Mapping
+Add cluster nodes IP/hostname’s in /etc/hosts file of all cluster nodes
+
+# cat /etc/hosts
+
+
+cm.asia-south2-a.c.adroit-resolver-413814.internal
+nn.asia-south2-a.c.adroit-resolver-413814.internal
+snn.asia-south1-c.c.adroit-resolver-413814.internal
+dn1.us-central1-a.c.adroit-resolver-413814.internal
+dn2.us-central1-a.c.adroit-resolver-413814.internal
+
+
+-------------------------------------------------------------
+
+Export Certificates from Master to all other nodes.
+
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@kcdpworkerm1.good-code.com
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@kcdpworkern1.good-code.com
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@kcdpworkero1.good-code.com
