@@ -8,6 +8,10 @@ snn.asia-south1-c.c.adroit-resolver-413814.internal
 dn1.us-central1-a.c.adroit-resolver-413814.internal
 dn2.us-central1-a.c.adroit-resolver-413814.internal
 
+
+for h in nn.asia-south2-a.c.adroit-resolver-413814.internal snn.asia-south1-c.c.adroit-resolver-413814.internal dn1.us-central1-a.c.adroit-resolver-413814.internal dn2.us-central1-a.c.adroit-resolver-413814.internal ; { scp /etc/krb5.conf root@$h:/etc ; }
+
+
 # cat /etc/redhat-release
 Red Hat Enterprise Linux Server release 7.9 (Maipo)
 Locale information

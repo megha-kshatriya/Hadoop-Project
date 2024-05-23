@@ -173,6 +173,9 @@ timedatectl status
 #Install locate to find any file/directory
 
 sudo yum install mlocate
+sudo updatedb
+locate bash_completion.sh
+locate -b '\bash_completion.sh'
 
 ---------------------------------------------------------------
 
